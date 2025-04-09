@@ -21,5 +21,18 @@ data class HabitCompletion(
     val date: String,
     val isCompleted: Boolean,
     val note: String? = null,
-    val entryTime: Long = System.currentTimeMillis()
+    val entryTime: Long = System.currentTimeMillis(),
+    val progressStatus: String = ProgressStatus.NEUTRAL.status
 )
+
+enum class ProgressStatus(val status: String) {
+    PRODUCTIVE("Productive"),
+    NEUTRAL("Neutral"),
+    MISSED("Missed");
+
+    companion object {
+        fun fromString(value: String): ProgressStatus {
+            return entries.firstOrNull { it.status == value } ?: NEUTRAL
+        }
+    }
+}
