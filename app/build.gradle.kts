@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.gangulwar.habitheat"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.gangulwar.habitheat"
