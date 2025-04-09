@@ -39,6 +39,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -260,7 +262,7 @@ fun HabitHeatmap(
                 timeInMillis = prev.timeInMillis
                 add(Calendar.DAY_OF_YEAR, -1)
             }
-        }.take(180).map { dateFormatter.format(it.time) }.toList().reversed()
+        }.take(70).map { dateFormatter.format(it.time) }.toList().reversed()
     }
 
     val completedMap = completions.associateBy { it.date }
@@ -280,14 +282,11 @@ fun HabitHeatmap(
             ) {
                 columnDates.forEach { date ->
                     val isCompleted = completedMap[date]?.isCompleted ?: false
-                    val color = if (isCompleted) AppColors.Progress.Achieved else AppColors.Progress.None
 
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .clip(RoundedCornerShape(1.dp))
-                            .background(color)
-                            .clickable { onDateClick(date) }
+                    HabitDot(
+                        date = date,
+                        isCompleted = isCompleted,
+                        onClick = onDateClick
                     )
                 }
             }
@@ -468,4 +467,26 @@ fun AddHabitDialog(
             }
         }
     }
+}
+
+
+@Composable
+fun HabitDot(
+    date: String,
+    isCompleted: Boolean,
+    onClick: (String) -> Unit
+) {
+    val color = if (isCompleted) AppColors.Progress.Achieved else AppColors.Progress.None
+
+    Box(
+        modifier = Modifier
+            .size(12.dp)
+            .padding(bottom = 2.dp)
+            .clip(RoundedCornerShape(2.dp))
+            .background(color)
+            .clickable { onClick(date) }
+            .semantics {
+                contentDescription = "$date - ${if (isCompleted) "Completed" else "No entry"}"
+            }
+    )
 }
