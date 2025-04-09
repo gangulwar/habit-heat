@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class HabitViewModel(
-    private val repository: IHabitRepository
+    val repository: IHabitRepository
 ) : ViewModel() {
 
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
