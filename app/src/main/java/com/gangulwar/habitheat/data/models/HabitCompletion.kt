@@ -19,5 +19,7 @@ data class HabitCompletion(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val habitId: Long,
     val date: String,
-    val isCompleted: Boolean
+    val isCompleted: Boolean,
+    val note: String? = null,
+    val entryTime: Long = System.currentTimeMillis()
 )
