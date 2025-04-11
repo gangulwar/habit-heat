@@ -1,4 +1,4 @@
-package com.gangulwar.habitheat.presentation.ui
+package com.gangulwar.habitheat.presentation.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,59 +10,37 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.*
 import com.gangulwar.habitheat.presentation.viewmodel.HabitViewModel
 import org.koin.androidx.compose.koinViewModel
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gangulwar.habitheat.data.models.Habit
-import com.gangulwar.habitheat.data.models.HabitCompletion
+import com.gangulwar.habitheat.presentation.ui.components.HabitCard
 import com.gangulwar.habitheat.utils.AppColors
 import com.gangulwar.habitheat.utils.AppDimensions
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Composable
-fun HabitHeatApp() {
+fun HabitHeatApp(
+    modifier: Modifier
+) {
     MaterialTheme {
         val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = "home") {
+        NavHost(modifier = modifier, navController = navController, startDestination = "home") {
             composable("home") {
                 HomeScreen(navController = navController)
             }
@@ -143,39 +121,6 @@ fun HomeScreen(
 }
 
 @Composable
-fun EmptyHabitsScreen(onAddHabit: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(AppDimensions.ContainerPadding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "No habits added yet",
-            color = AppColors.Muted.Foreground,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Button(
-            onClick = onAddHabit,
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AppColors.Primary.Default,
-                contentColor = AppColors.Primary.Foreground
-            ),
-            shape = RoundedCornerShape(AppDimensions.RadiusSm)
-        ) {
-            Text("Add Your First Habit")
-        }
-    }
-}
-
-@Composable
 fun HabitsList(habits: List<Habit>, viewModel: HabitViewModel) {
     LazyColumn(
         modifier = Modifier
@@ -190,144 +135,6 @@ fun HabitsList(habits: List<Habit>, viewModel: HabitViewModel) {
     }
 }
 
-@Composable
-fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
-    val scope = rememberCoroutineScope()
-    var completions by remember { mutableStateOf<List<HabitCompletion>>(emptyList()) }
-
-    LaunchedEffect(habit.id) {
-        scope.launch {
-            completions = viewModel.repository.getStatsForHabit(habit.id)
-        }
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = RoundedCornerShape(AppDimensions.RadiusMd),
-        colors = CardDefaults.cardColors(
-            containerColor = AppColors.Card.Default,
-            contentColor = AppColors.Card.Foreground
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(1.dp, AppColors.Border)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) {
-                Text(
-                    text = habit.emoji ?: "😀",
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    text = habit.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = AppColors.Card.Foreground
-                )
-            }
-
-            HabitHeatmap(
-                habitId = habit.id,
-                completions = completions,
-                onDateClick = { date ->
-                    scope.launch {
-                        viewModel.markCompleted(habit.id, null)
-                    }
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun HabitHeatmap(
-    habitId: Long,
-    completions: List<HabitCompletion>,
-    onDateClick: (String) -> Unit
-) {
-    val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
-
-    val dates = remember {
-        generateSequence(Calendar.getInstance()) { prev ->
-            Calendar.getInstance().apply {
-                timeInMillis = prev.timeInMillis
-                add(Calendar.DAY_OF_YEAR, -1)
-            }
-        }.take(70).map { dateFormatter.format(it.time) }.toList().reversed()
-    }
-
-    val completedMap = completions.associateBy { it.date }
-
-    val columns = 10
-    val rows = 8
-
-    val dateColumns = dates.chunked(rows)
-
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.height(180.dp)
-    ) {
-        dateColumns.forEach { columnDates ->
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                columnDates.forEach { date ->
-                    val isCompleted = completedMap[date]?.isCompleted ?: false
-
-                    HabitDot(
-                        date = date,
-                        isCompleted = isCompleted,
-                        onClick = onDateClick
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun <T> GridLayout(
-    items: List<T>,
-    columns: Int,
-    modifier: Modifier = Modifier,
-    content: @Composable (T) -> Unit
-) {
-    Column(modifier = modifier) {
-        val rows = (items.size + columns - 1) / columns
-
-        for (rowIndex in 0 until rows) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                for (colIndex in 0 until columns) {
-                    val itemIndex = rowIndex * columns + colIndex
-                    if (itemIndex < items.size) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(vertical = 2.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            content(items[itemIndex])
-                        }
-                    } else {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -467,26 +274,4 @@ fun AddHabitDialog(
             }
         }
     }
-}
-
-
-@Composable
-fun HabitDot(
-    date: String,
-    isCompleted: Boolean,
-    onClick: (String) -> Unit
-) {
-    val color = if (isCompleted) AppColors.Progress.Achieved else AppColors.Progress.None
-
-    Box(
-        modifier = Modifier
-            .size(12.dp)
-            .padding(bottom = 2.dp)
-            .clip(RoundedCornerShape(2.dp))
-            .background(color)
-            .clickable { onClick(date) }
-            .semantics {
-                contentDescription = "$date - ${if (isCompleted) "Completed" else "No entry"}"
-            }
-    )
 }
