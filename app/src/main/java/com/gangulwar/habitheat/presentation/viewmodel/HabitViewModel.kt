@@ -37,9 +37,8 @@ class HabitViewModel(
         }
     }
 
-    fun markCompleted(habitId: Long, note: String?, progressStatus: ProgressStatus) {
+    fun markCompleted(habitId: Long, note: String?,date: String, progressStatus: ProgressStatus) {
         viewModelScope.launch {
-            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             repository.markHabitCompleted(habitId, date, note, progressStatus)
         }
     }

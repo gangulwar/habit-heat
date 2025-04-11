@@ -60,11 +60,11 @@ fun HabitHeatmap(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 columnDates.forEach { date ->
-                    val isCompleted = completedMap[date]?.isCompleted ?: false
+                    val completion = completedMap[date]
 
                     HabitDot(
                         date = date,
-                        isCompleted = isCompleted,
+                        completion = completion,
                         onClick = onDateClick
                     )
                 }
