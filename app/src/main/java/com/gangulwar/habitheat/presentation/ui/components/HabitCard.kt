@@ -1,6 +1,7 @@
 package com.gangulwar.habitheat.presentation.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gangulwar.habitheat.data.models.Habit
@@ -65,12 +67,28 @@ fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
                     fontSize = 24.sp,
                     modifier = Modifier.padding(end = 8.dp)
                 )
-                Text(
-                    text = habit.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = AppColors.Card.Foreground
-                )
+                Column (
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(1.dp,Alignment.CenterVertically)
+                ){
+                    Text(
+                        text = habit.name,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        color = AppColors.Card.Foreground
+                    )
+
+                    habit.description?.let {
+                        Text(
+                            text = it,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 12.sp,
+                            color = AppColors.Card.Foreground,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
 
             HabitHeatmap(

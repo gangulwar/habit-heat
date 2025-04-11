@@ -144,6 +144,7 @@ fun AddHabitDialog(
 ) {
     var habitName by remember { mutableStateOf("") }
     var habitEmoji by remember { mutableStateOf("") }
+    var habitDescription by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -156,9 +157,7 @@ fun AddHabitDialog(
                     .fillMaxWidth()
                     .padding(20.dp)
             ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "Add New Habit",
                         fontSize = 20.sp,
@@ -166,7 +165,6 @@ fun AddHabitDialog(
                         color = AppColors.Popover.Foreground,
                         modifier = Modifier.align(Alignment.Center)
                     )
-
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier.align(Alignment.CenterEnd)
@@ -181,13 +179,7 @@ fun AddHabitDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Habit Name",
-                    fontWeight = FontWeight.Medium,
-                    color = AppColors.Popover.Foreground,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
+                Text("Habit Name", fontWeight = FontWeight.Medium, color = AppColors.Popover.Foreground)
                 OutlinedTextField(
                     value = habitName,
                     onValueChange = { habitName = it },
@@ -203,13 +195,7 @@ fun AddHabitDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Icon (optional)",
-                    fontWeight = FontWeight.Medium,
-                    color = AppColors.Popover.Foreground,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
+                Text("Icon (optional)", fontWeight = FontWeight.Medium, color = AppColors.Popover.Foreground)
                 OutlinedTextField(
                     value = habitEmoji,
                     onValueChange = { habitEmoji = it },
@@ -222,12 +208,28 @@ fun AddHabitDialog(
                         cursorColor = AppColors.Primary.Default,
                     )
                 )
-
                 Text(
                     text = "Use a simple emoji, like 📚, 👍, or 🏃",
                     fontSize = 14.sp,
                     color = AppColors.Muted.Foreground,
                     modifier = Modifier.padding(top = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Description (optional)", fontWeight = FontWeight.Medium, color = AppColors.Popover.Foreground)
+                OutlinedTextField(
+                    value = habitDescription,
+                    onValueChange = { habitDescription = it },
+                    placeholder = { Text("Briefly describe the habit", color = AppColors.Muted.Foreground) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = false,
+                    maxLines = 3,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = AppColors.Primary.Default,
+                        unfocusedBorderColor = AppColors.Input,
+                        cursorColor = AppColors.Primary.Default,
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -242,9 +244,7 @@ fun AddHabitDialog(
                             containerColor = AppColors.Muted.Default,
                             contentColor = AppColors.Muted.Foreground
                         ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
+                        modifier = Modifier.weight(1f).height(48.dp),
                         shape = RoundedCornerShape(AppDimensions.RadiusSm)
                     ) {
                         Text("Cancel")
@@ -253,7 +253,11 @@ fun AddHabitDialog(
                     Button(
                         onClick = {
                             if (habitName.isNotBlank()) {
-                                onAddHabit(habitName, habitEmoji.takeIf { it.isNotEmpty() }, null)
+                                onAddHabit(
+                                    habitName,
+                                    habitEmoji.takeIf { it.isNotEmpty() },
+                                    habitDescription.takeIf { it.isNotBlank() }
+                                )
                             }
                         },
                         enabled = habitName.isNotBlank(),
@@ -263,9 +267,7 @@ fun AddHabitDialog(
                             disabledContainerColor = AppColors.Muted.Default,
                             disabledContentColor = AppColors.Muted.Foreground
                         ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
+                        modifier = Modifier.weight(1f).height(48.dp),
                         shape = RoundedCornerShape(AppDimensions.RadiusSm)
                     ) {
                         Text("Add Habit")
