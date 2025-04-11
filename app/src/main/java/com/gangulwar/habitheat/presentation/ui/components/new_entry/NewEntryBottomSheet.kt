@@ -37,8 +37,7 @@ import java.util.Locale
 fun NewEntryBottomSheet(
     date: LocalDate,
     onSaveEntry: (ProgressStatus, String?, String) -> Unit,
-    onCancel: () -> Unit,
-    onChangeDate: () -> Unit
+    onCancel: () -> Unit
 ) {
     var selectedStatus by remember { mutableStateOf<ProgressStatus?>(null) }
     var note by remember { mutableStateOf("") }

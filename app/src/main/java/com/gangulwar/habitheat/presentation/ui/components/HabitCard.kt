@@ -45,7 +45,6 @@ fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    var showCalendar by remember { mutableStateOf(false) }
 
     LaunchedEffect(habit.id) {
         viewModel.getStatsForHabit(habit.id) {
@@ -79,9 +78,6 @@ fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
                         bottomSheetState.hide()
                         showBottomSheet = false
                     }
-                },
-                onChangeDate = {
-                    showCalendar = true
                 }
             )
         }
