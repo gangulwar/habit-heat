@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gangulwar.habitheat.data.models.Habit
-import com.gangulwar.habitheat.data.models.HabitCompletion
 import com.gangulwar.habitheat.presentation.viewmodel.HabitViewModel
 import com.gangulwar.habitheat.utils.AppColors
 import com.gangulwar.habitheat.utils.AppDimensions
@@ -33,6 +32,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import com.gangulwar.habitheat.presentation.ui.components.new_entry.NewEntryBottomSheet
 import java.time.LocalDate
@@ -42,15 +42,15 @@ import java.time.LocalDate
 @Composable
 fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
     val scope = rememberCoroutineScope()
-    var completions by remember { mutableStateOf<List<HabitCompletion>>(emptyList()) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
+    val completionsMap by viewModel.habitCompletionsMap.collectAsState()
+    val completions = completionsMap[habit.id].orEmpty()
+
     LaunchedEffect(habit.id) {
-        viewModel.getStatsForHabit(habit.id) {
-            completions = it
-        }
+        viewModel.getStatsForHabit(habit.id)
     }
 
     if (showBottomSheet) {
@@ -65,7 +65,7 @@ fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
                 date = selectedDate,
                 onSaveEntry = { status, note, date ->
                     scope.launch {
-                        viewModel.markCompleted(
+                        viewModel.markCompletedAndRefresh(
                             habitId = habit.id,
                             note = note,
                             date = date,

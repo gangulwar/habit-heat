@@ -9,9 +9,8 @@ import com.gangulwar.habitheat.data.repo.IHabitRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 
 class HabitViewModel(
     val repository: IHabitRepository
@@ -19,6 +18,20 @@ class HabitViewModel(
 
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
     val habits: StateFlow<List<Habit>> = _habits.asStateFlow()
+
+    private val _habitCompletionsMap = MutableStateFlow<Map<Long, List<HabitCompletion>>>(emptyMap())
+    val habitCompletionsMap: StateFlow<Map<Long, List<HabitCompletion>>> = _habitCompletionsMap
+
+    fun getStatsForHabit(habitId: Long) {
+        viewModelScope.launch {
+            val completions = repository.getStatsForHabit(habitId)
+            _habitCompletionsMap.update { currentMap ->
+                currentMap.toMutableMap().apply {
+                    this[habitId] = completions
+                }
+            }
+        }
+    }
 
     init {
         loadHabits()
@@ -37,9 +50,10 @@ class HabitViewModel(
         }
     }
 
-    fun markCompleted(habitId: Long, note: String?,date: String, progressStatus: ProgressStatus) {
+    fun markCompletedAndRefresh(habitId: Long, note: String?, date: String, progressStatus: ProgressStatus) {
         viewModelScope.launch {
             repository.markHabitCompleted(habitId, date, note, progressStatus)
+            getStatsForHabit(habitId)
         }
     }
 
