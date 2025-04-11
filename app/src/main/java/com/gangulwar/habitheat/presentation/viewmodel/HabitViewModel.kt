@@ -3,6 +3,8 @@ package com.gangulwar.habitheat.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gangulwar.habitheat.data.models.Habit
+import com.gangulwar.habitheat.data.models.HabitCompletion
+import com.gangulwar.habitheat.data.models.ProgressStatus
 import com.gangulwar.habitheat.data.repo.IHabitRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,10 +37,17 @@ class HabitViewModel(
         }
     }
 
-    fun markCompleted(habitId: Long, note: String?) {
+    fun markCompleted(habitId: Long, note: String?, progressStatus: ProgressStatus) {
         viewModelScope.launch {
             val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-            repository.markHabitCompleted(habitId, date, note)
+            repository.markHabitCompleted(habitId, date, note, progressStatus)
+        }
+    }
+
+    fun getStatsForHabit(habitId: Long, onResult: (List<HabitCompletion>) -> Unit) {
+        viewModelScope.launch {
+            val stats = repository.getStatsForHabit(habitId)
+            onResult(stats)
         }
     }
 

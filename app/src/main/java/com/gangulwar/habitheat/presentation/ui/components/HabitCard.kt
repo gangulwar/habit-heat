@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gangulwar.habitheat.data.models.Habit
 import com.gangulwar.habitheat.data.models.HabitCompletion
+import com.gangulwar.habitheat.data.models.ProgressStatus
 import com.gangulwar.habitheat.presentation.viewmodel.HabitViewModel
 import com.gangulwar.habitheat.utils.AppColors
 import com.gangulwar.habitheat.utils.AppDimensions
@@ -36,8 +37,8 @@ fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
     var completions by remember { mutableStateOf<List<HabitCompletion>>(emptyList()) }
 
     LaunchedEffect(habit.id) {
-        scope.launch {
-            completions = viewModel.repository.getStatsForHabit(habit.id)
+        viewModel.getStatsForHabit(habit.id) {
+            completions = it
         }
     }
 
@@ -96,7 +97,7 @@ fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
                 completions = completions,
                 onDateClick = { date ->
                     scope.launch {
-                        viewModel.markCompleted(habit.id, null)
+                        viewModel.markCompleted(habit.id, null, ProgressStatus.PRODUCTIVE)
                     }
                 }
             )

@@ -4,6 +4,7 @@ import com.gangulwar.habitheat.data.dao.HabitCompletionDao
 import com.gangulwar.habitheat.data.dao.HabitDao
 import com.gangulwar.habitheat.data.models.Habit
 import com.gangulwar.habitheat.data.models.HabitCompletion
+import com.gangulwar.habitheat.data.models.ProgressStatus
 
 class HabitRepositoryImpl(
     private val habitDao: HabitDao,
@@ -22,13 +23,14 @@ class HabitRepositoryImpl(
         habitDao.deleteHabit(habit)
     }
 
-    override suspend fun markHabitCompleted(habitId: Long, date: String, note: String?) {
+    override suspend fun markHabitCompleted(habitId: Long, date: String, note: String?, progressStatus: ProgressStatus) {
         completionDao.insertCompletion(
             HabitCompletion(
                 habitId = habitId,
                 date = date,
                 note = note,
-                isCompleted = true
+                isCompleted = true,
+                progressStatus = progressStatus.status
             )
         )
     }
