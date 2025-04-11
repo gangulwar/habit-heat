@@ -66,6 +66,13 @@ object AppColors {
         val Mixed = Color(0xFF60A5FA)
         val Achieved = Color(0xFF34D399)
     }
+
+    object Button{
+        val EnableBackground = Color(0xFF0F172A)
+        val DisableBackground = Color(0xFF888B94)
+        val EnableContent = Color(0xFFF8FAFC)
+        val DisableContent = Color(0xFFFBFDFD)
+    }
 }
 
 object AppDimensions {

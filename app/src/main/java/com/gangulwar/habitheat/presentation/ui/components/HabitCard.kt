@@ -33,6 +33,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.ui.graphics.Color
 import com.gangulwar.habitheat.presentation.ui.components.new_entry.NewEntryBottomSheet
 import java.time.LocalDate
 
@@ -42,7 +43,7 @@ import java.time.LocalDate
 fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
     val scope = rememberCoroutineScope()
     var completions by remember { mutableStateOf<List<HabitCompletion>>(emptyList()) }
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
@@ -56,15 +57,16 @@ fun HabitCard(habit: Habit, viewModel: HabitViewModel) {
         ModalBottomSheet(
             onDismissRequest = { showBottomSheet = false },
             sheetState = bottomSheetState,
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            containerColor = Color.White,
         ) {
             NewEntryBottomSheet(
+                habitName = habit.name,
                 date = selectedDate,
                 onSaveEntry = { status, note, date ->
                     scope.launch {
                         viewModel.markCompleted(
-                            habitId =
-                            habit.id,
+                            habitId = habit.id,
                             note = note,
                             date = date,
                             progressStatus = status
